@@ -12,7 +12,7 @@ Vue.createApp({
             error => console.log(error)
         )
     }
-}).mount('#zenn')
+}).mount('#zenn');
 
 Vue.createApp({
     data() {
@@ -28,7 +28,7 @@ Vue.createApp({
             error => console.log(error)
         )
     }
-}).mount('#qiita')
+}).mount('#qiita');
 
 Vue.createApp({
     data() {
@@ -47,4 +47,4 @@ Vue.createApp({
             error => console.log(error)
         )
     }
-}).mount('#dev')
+}).mount('#dev');
