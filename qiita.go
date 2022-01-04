@@ -51,54 +51,48 @@ func main() {
 
 	doc.Find("article").Each(func(i int, s *goquery.Selection) {
 
-		header := s.Find("header")
-		a := header.Find("a")
+		section := s.Find("section")
 
-		qiita := qiita{}
+		var qiita qiita
 
-		a.Each(func(ii int, ss *goquery.Selection) {
-			href, _ := ss.Attr("href")
-			text := ss.Text()
+		// Section 1
+		section1 := section.First()
 
-			if !strings.HasPrefix(href, "/organizations/") && len(text) > 0 {
-				qiita.Username = text
-			}
-		})
-
+		a := section1.Find("a")
+		qiita.Username = a.Text()
 		avatar, _ := a.Find("img").Attr("src")
 		qiita.Avatar = avatar
 
-		datetime, _ := header.Find("time").Attr("datetime")
-		t, err := time.Parse(time.RFC3339, datetime)
+		p := section1.Find("p").Last()
+		v := strings.Split(p.Text(), " ")
+		t, err := time.Parse("2006-01-02", v[2])
 		if err != nil {
 			log.Fatal(err)
 		}
 		qiita.Datetime = t
 
-		a = s.Find("h2").Find("a")
+		// Section 2
+		section2 := section1.Next()
+
+		a = section2.Find("h2").Find("a")
 		qiita.Title = a.Text()
 		href, _ := a.Attr("href")
 		qiita.URL = href
 
-		footer := s.Find("footer")
+		// Section 3
+		section3 := section2.Next()
+
+		div := section3.Children().Find("div")
+		div1 := div.First()
 
 		var tags []string
-		footer.Find("a").Each(func(ii int, ss *goquery.Selection) {
-			href, _ := ss.Attr("href")
-
-			if strings.HasPrefix(href, "/tags/") {
-				tags = append(tags, ss.Text())
-			}
+		div1.Find("a").Each(func(ii int, ss *goquery.Selection) {
+			tags = append(tags, ss.Text())
 		})
 		qiita.Tags = tags
 
-		footer.Find("div").EachWithBreak(func(ii int, ss *goquery.Selection) bool {
-			if lgtm, err := strconv.Atoi(ss.Text()); err == nil {
-				qiita.LGTM = lgtm
-				return false
-			}
-			return true
-		})
+		lgtm, _ := strconv.Atoi(div1.Next().Text())
+		qiita.LGTM = lgtm
 
 		qiitas = append(qiitas, qiita)
 	})
