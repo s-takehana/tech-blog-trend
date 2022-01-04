@@ -15,11 +15,11 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
-        go-version: 1.16
+        go-version: 1.17
 
     - name: Execute
       run: |
-        go mod tidy
+        go mod download
         go run zenn_dev.go -s zenn -f ./zenn.json
         go run qiita.go
 
